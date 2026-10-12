@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POC Shop – GTM Test Page</title>
+
+<!-- 1. dataLayer created BEFORE GTM loads -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-TRCF38T5');</script>
+<!-- End Google Tag Manager -->
+
+<style>
+  :root { --bg:#f7f6f2; --card:#ffffff; --ink:#1f2328; --muted:#6b7078; --accent:#2f6f4f; --line:#e3e1da; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--ink); }
+  header { padding:16px; border-bottom:1px solid var(--line); background:var(--card); }
+  header b { font-size:18px; }
+  header span { color:var(--muted); font-size:13px; margin-left:8px; }
+  main { max-width:720px; margin:24px auto; padding:0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; }
+  .img { height:160px; border-radius:8px; background:linear-gradient(135deg,#cfe3d6,#9cc5ad); display:flex; align-items:center; justify-content:center; font-size:48px; }
+  h1 { font-size:22px; margin:16px 0 4px; }
+  .price { font-size:20px; color:var(--accent); font-weight:600; }
+  .muted { color:var(--muted); font-size:14px; }
+  .btns { display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  button { padding:10px 16px; border-radius:8px; border:1px solid var(--accent); background:var(--accent); color:#fff; font-size:15px; cursor:pointer; }
+  button.secondary { background:#fff; color:var(--accent); }
+  h2 { font-size:16px; margin:24px 0 8px; }
+  pre { background:#1f2328; color:#d6f5e1; padding:12px; border-radius:8px; font-size:12px; overflow-x:auto; min-height:60px; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TRCF38T5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<header><b>POC Shop</b><span>GTM + GA4 test page (POC only, not a real shop)</span></header>
+
+<main>
+  <div class="card">
+    <div class="img">🪴</div>
+    <h1>Ceramic Plant Pot</h1>
+    <div class="price">€25.00</div>
+    <p class="muted">SKU: POT-001 · Category: Home &amp; Garden</p>
+    <div class="btns">
+      <button id="btn-add">Add to cart</button>
+      <button id="btn-checkout" class="secondary">Begin checkout</button>
+      <button id="btn-purchase" class="secondary">Purchase</button>
+    </div>
+  </div>
+
+  <h2>dataLayer pushes on this page (for learning)</h2>
+  <pre id="log"></pre>
+</main>
+
+<script>
+  // One product, GA4 recommended e-commerce item format
+  var item = {
+    item_id: 'POT-001',
+    item_name: 'Ceramic Plant Pot',
+    item_category: 'Home & Garden',
+    price: 25.00,
+    quantity: 1
+  };
+
+  function push(eventName, extra) {
+    // Best practice: clear the previous ecommerce object first
+    window.dataLayer.push({ ecommerce: null });
+    var payload = {
+      event: eventName,
+      ecommerce: Object.assign({ currency: 'EUR', value: 25.00, items: [item] }, extra || {})
+    };
+    window.dataLayer.push(payload);
+    document.getElementById('log').textContent += JSON.stringify(payload) + '\n';
+  }
+
+  // view_item fires on page load
+  push('view_item');
+
+  document.getElementById('btn-add').onclick = function () { push('add_to_cart'); };
+  document.getElementById('btn-checkout').onclick = function () { push('begin_checkout'); };
+  document.getElementById('btn-purchase').onclick = function () {
+    // transaction_id must be unique per order (used for de-duplication)
+    push('purchase', { transaction_id: 'T-' + Date.now() });
+  };
+</script>
+</body>
+</html>
